@@ -77,7 +77,8 @@ def main():
 
     loss_history = []
     total_coord_time = 0.0
-
+    successful_rounds = 0
+    failed_rounds = 0
     # -------------------------------
     # Training loop
     # -------------------------------
@@ -100,9 +101,13 @@ def main():
         if combined_batch:
             loss = trainer.train(combined_batch)
             loss_history.append(loss)
+            successful_rounds += 1
+        else:
+            failed_rounds += 1
 
         coordination_time = time.time() - start_time
         total_coord_time += coordination_time
+        
 
     # -------------------------------
     # Final Results
@@ -112,6 +117,8 @@ def main():
 
     print("\n===== CENTRALIZED RESULTS =====")
     print("Total rounds:", sys_cfg["system"]["aggregation_rounds"])
+    print("Successful rounds:", successful_rounds)
+    print("Failed rounds:", failed_rounds)
     print("Average coordination time per round:", avg_coord_time)
 
     if loss_history:

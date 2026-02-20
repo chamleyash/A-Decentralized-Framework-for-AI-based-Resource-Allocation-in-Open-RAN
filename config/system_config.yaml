@@ -12,7 +12,7 @@ federated_learning:
 
 communication:
   latency_ms: 50
-  packet_loss_prob: 0.3
+  packet_loss_prob: 0.4
 
 faults:
   enable_dropout: false
