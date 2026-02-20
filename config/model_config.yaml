@@ -1,0 +1,11 @@
+# Model and training configuration
+
+model:
+  state_dim: 10
+  action_dim: 5
+  hidden_layers: [64, 64]
+
+training:
+  optimizer: adam
+  learning_rate: 0.001
+  gamma: 0.99

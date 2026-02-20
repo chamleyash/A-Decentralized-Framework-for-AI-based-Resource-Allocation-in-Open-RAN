@@ -1,0 +1,19 @@
+# System-level configuration
+
+system:
+  num_edge_agents: 6
+  num_regions: 2
+  aggregation_rounds: 200
+
+federated_learning:
+  local_epochs: 5
+  batch_size: 32
+  aggregation_method: fedavg
+
+communication:
+  latency_ms: 50
+  packet_loss_prob: 0.3
+
+faults:
+  enable_dropout: false
+  dropout_rate: 0.0
