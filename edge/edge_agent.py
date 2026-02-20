@@ -20,9 +20,14 @@ class EdgeAgent:
 
     def local_update(self):
         data = self.collector.get_data()
-        self.trainer.train(data)
+
+        loss = 0.0
+        if data:
+            loss = self.trainer.train(data)
+
         self.collector.clear()
-        return self.trainer.get_model_weights()
+
+        return self.trainer.get_model_weights(), loss
     
     def set_weights(self, global_weights):
         if global_weights is None:

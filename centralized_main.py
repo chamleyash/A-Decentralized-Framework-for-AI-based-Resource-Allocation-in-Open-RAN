@@ -5,7 +5,10 @@ from edge.edge_agent import EdgeAgent
 from edge.local_trainer import LocalTrainer
 from edge.data_collector import DataCollector
 from global_server.global_server import GlobalServer
+import matplotlib.pyplot as plt
 import torch.optim as optim
+import os
+import json
 import time
 
 
@@ -72,6 +75,7 @@ def main():
     # Metrics
     # -------------------------------
 
+    loss_history = []
     total_coord_time = 0.0
 
     # -------------------------------
@@ -82,28 +86,26 @@ def main():
 
         edge_batches = []
 
-        # Edges generate experience only
         for edge in edges:
             edge.step()
             batch = edge.collector.get_data()
             edge_batches.append(batch)
 
-        # Combine data centrally
         combined_batch = []
         for batch in edge_batches:
             combined_batch.extend(batch)
 
-        # Train global model directly
         start_time = time.time()
 
         if combined_batch:
-            trainer.train(combined_batch)
+            loss = trainer.train(combined_batch)
+            loss_history.append(loss)
 
         coordination_time = time.time() - start_time
         total_coord_time += coordination_time
 
     # -------------------------------
-    # Final metrics
+    # Final Results
     # -------------------------------
 
     avg_coord_time = total_coord_time / sys_cfg["system"]["aggregation_rounds"]
@@ -111,6 +113,23 @@ def main():
     print("\n===== CENTRALIZED RESULTS =====")
     print("Total rounds:", sys_cfg["system"]["aggregation_rounds"])
     print("Average coordination time per round:", avg_coord_time)
+
+    if loss_history:
+        os.makedirs("Loss", exist_ok=True)
+        with open("Loss/centralized_loss.json", "w") as f:
+            json.dump({
+                "loss_history": loss_history,
+                "avg_coord_time": avg_coord_time
+            }, f)
+        print("Initial loss:", loss_history[0])
+        print("Final loss:", loss_history[-1])
+        print("Average loss:", sum(loss_history) / len(loss_history))
+    plt.plot(loss_history, label="Loss")
+    plt.xlabel("Round")
+    plt.ylabel("Loss")
+    plt.title("Training Loss Over Rounds")
+    plt.legend()
+    plt.show()
 
 
 if __name__ == "__main__":
